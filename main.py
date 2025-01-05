@@ -13,6 +13,7 @@ def get_brightness(monitor_index):
         return 0
     return 0
 
+# Function to get the max brightness for a monitor
 def get_max_brightness(monitor_index):
     monitor_index_correct = monitor_index + 1
     try:
@@ -31,6 +32,7 @@ def set_brightness(value):
     command = f"sudo ddcutil setvcp 10 {value} --display {monitor_index_correct}"
     os.system(command)
 
+# Function to increase brightness for a monitor
 def increase_brightness():
     global active_row
     global brightness_levels
@@ -43,8 +45,7 @@ def increase_brightness():
     update_brightness()
     set_brightness(brightness)
 
-
-
+# Function to decrease brightness for a monitor
 def decrease_brightness():
     global active_row
     global brightness_levels
@@ -65,6 +66,7 @@ def fetch_monitors():
             monitors.append(line.strip().split(":")[1].strip())
     return monitors
 
+# Function to update the display to reflect the active monitor
 def update_active_inactive():
     global display_columns
     global active_row
@@ -76,6 +78,7 @@ def update_active_inactive():
         else:
             row1.set_text("INACTIVE")
 
+# Function to update the display to reflect the updated brightness value
 def update_brightness():
     global display_columns
     global brightness_levels
@@ -91,29 +94,29 @@ def handle_input(key):
     global brightness_levels
     global max_brightness_levels
     global active_row
+    # Make monitor to the left the active monitor
     if key == "left":
         if active_row > 0:
             active_row -= 1
             update_active_inactive()
+    # Make monitor to the right the active monitor
     elif key == "right":
         if active_row < len(monitors)-1:
             active_row += 1
             update_active_inactive()
+    # Increase the brightness of the active monitor
     elif key == "up":
         if brightness_levels[active_row] < max_brightness_levels[active_row]:
             increase_brightness()
+    # Decrease the brightness of the active monitor
     elif key == "down":
         if brightness_levels[active_row] > 0:
             decrease_brightness()
+    # Terminate the application
     elif key == "q":
         raise urwid.ExitMainLoop()
 
-# Fetch monitors and initialize brightness levels
-monitors = fetch_monitors()
-brightness_levels = [get_brightness(i) for i in range(len(monitors))]
-max_brightness_levels = [get_max_brightness(i) for i in range(len(monitors))]
-active_row = 0
-
+# Initial display generation
 def generate_display_columns():
     global monitors
     global brightness_levels
@@ -131,6 +134,14 @@ def generate_display_columns():
         display_columns.append(col)
 
     return display_columns
+
+
+# Fetch monitors and initialize brightness levels
+monitors = fetch_monitors()
+brightness_levels = [get_brightness(i) for i in range(len(monitors))]
+max_brightness_levels = [get_max_brightness(i) for i in range(len(monitors))]
+active_row = 0
+
 
 
 # Build UI
